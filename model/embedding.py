@@ -17,7 +17,6 @@ class PositionalEncoding(nn.Module):
         self.d_model = d_model
         self.max_len = max_len
 
-
         self.embedding = torch.zeros(max_len, d_model)
         self.pos = torch.arange(0 , max_len).float().unsqueeze(1)
         self.two_i = torch.arange(0, d_model, 2).float()
