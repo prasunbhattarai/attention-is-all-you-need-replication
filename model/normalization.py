@@ -15,3 +15,16 @@ class LayerNormalization(nn.Module):
         var = x.var(dim = -1, keepdim = True)
         norm_x = (x - mean)/ torch.sqrt(var + self.e)
         return self.alpha * norm_x + self.bias
+
+
+class ResidualConnectin(nn.Module):
+    def __init__(self, dropout):
+        super().__init__()
+        self.dropout = nn.Dropout(dropout)
+        self.norm_layer = LayerNormalization()
+
+    def forward(self, x, sublayer):
+        x = sublayer(self.norm_layer(x))
+        x = self.dropout(x)
+        x += x
+        return x
