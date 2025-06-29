@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from attention import MultiHeadAttention
-from normalization import LayerNormalization , ResidualConnectin
+from normalization import LayerNormalization , ResidualConnection
 from feed_forward import PositionalFeedForward
 
 
@@ -10,7 +10,7 @@ class EncoderBlock(nn.Module):
         super().__init__()
         self.self_attention  = MultiHeadAttention(d_model, no_head)
         self.feed_forward = PositionalFeedForward(d_model, dff, dropout)
-        self.residualconnection = nn.ModuleList([ResidualConnectin(dropout, d_model) for i in range (2)])
+        self.residualconnection = nn.ModuleList([ResidualConnection(dropout, d_model) for i in range (2)])
 
     def forward(self, x, src_mask ):
         x = self.residualconnection[0](x ,lambda x: self.self_attention(x,x,x, src_mask))
