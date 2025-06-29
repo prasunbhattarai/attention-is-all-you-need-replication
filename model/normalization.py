@@ -17,7 +17,7 @@ class LayerNormalization(nn.Module):
         return self.alpha * norm_x + self.bias
 
 
-class ResidualConnectin(nn.Module):
+class ResidualConnection(nn.Module):
     def __init__(self, dropout, d_model):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
