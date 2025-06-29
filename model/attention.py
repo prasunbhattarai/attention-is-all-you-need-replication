@@ -7,10 +7,13 @@ class ScaledDotProduct(nn.Module):
         super().__init__()
         self.softmax = nn.Softmax(dim =-1)
     
-    def forward(self, q, k, v):
+    def forward(self, q, k, v, mask):
         k_transpose = torch.transpose(k,-2,-1)
         numerator = q @ k_transpose  #torch.matmul(q, k_transpose)
         score = numerator/ math.sqrt(k.size(-1))
+        if mask is not None:
+            mask = mask.unsqueeze(1)
+            score.masked_fill_(mask == 0, -1e9)
         attention_weight = self.softmax(score)
         output = attention_weight @ v #torch.matmul( attention_weight,v)
 
@@ -27,7 +30,7 @@ class MultiHeadAttention(nn.Module):
         self.w_o = nn.Linear(d_model, d_model)
         self.d_k = d_model // no_head
         self.attention = ScaledDotProduct()
-    def forward(self, q, k, v):
+    def forward(self, q, k, v, mask=None):
         batch_size = q.size(0)
         seq_len = q.size(1)
 
@@ -39,8 +42,7 @@ class MultiHeadAttention(nn.Module):
         q_head = q_prime.view(batch_size, seq_len, self.no_head, self.d_k).transpose(1,2)
         k_head = k_prime.view(batch_size, seq_len, self.no_head, self.d_k).transpose(1,2)
         v_head = v_prime.view(batch_size, seq_len, self.no_head, self.d_k).transpose(1,2)
-
-        attention_output = self.attention(q_head,k_head,v_head).transpose(1,2)
+        attention_output = self.attention(q_head,k_head,v_head,mask).transpose(1,2)
         attention_output = attention_output.contiguous().view(batch_size, seq_len, self.d_model)
 
         return self.w_o(attention_output)

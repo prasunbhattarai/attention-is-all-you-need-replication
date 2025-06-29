@@ -18,13 +18,10 @@ class LayerNormalization(nn.Module):
 
 
 class ResidualConnectin(nn.Module):
-    def __init__(self, dropout):
+    def __init__(self, dropout, d_model):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
-        self.norm_layer = LayerNormalization()
+        self.norm_layer = LayerNormalization(d_model)
 
     def forward(self, x, sublayer):
-        x = sublayer(self.norm_layer(x))
-        x = self.dropout(x)
-        x += x
-        return x
+        return x + self.dropout(sublayer(self.norm_layer(x)))
