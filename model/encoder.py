@@ -18,9 +18,9 @@ class EncoderBlock(nn.Module):
         return x
     
 class Encoder(nn.Module):
-    def __init__(self, layer,N,d_model):
+    def __init__(self, layer: nn.ModuleList ,d_model):
         super().__init__()
-        self.layer = nn.ModuleList([layer for i in range (N)]) 
+        self.layer = layer
         self.norm = LayerNormalization(d_model)
     
     def forward(self, x, mask):
