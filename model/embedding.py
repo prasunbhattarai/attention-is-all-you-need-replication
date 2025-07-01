@@ -17,12 +17,15 @@ class PositionalEncoding(nn.Module):
         self.d_model = d_model
         self.max_len = max_len
 
+        pe = torch.zeros(max_len, d_model)
         self.embedding = torch.zeros(max_len, d_model)
         self.pos = torch.arange(0 , max_len).float().unsqueeze(1)
         self.two_i = torch.arange(0, d_model, 2).float()
                 
         self.embedding[:, 0::2] = torch.sin((self.pos)/(10000**(self.two_i / d_model)))
         self.embedding[:, 1::2] = torch.cos((self.pos)/(10000**(self.two_i / d_model)))
+        self.register_buffer("pe", pe)
+
     
     def forward (self, x):
         
