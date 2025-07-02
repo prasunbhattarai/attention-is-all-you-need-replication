@@ -1,9 +1,9 @@
-import torch
 import torch.nn as nn
-import math
 from embedding  import InputEmbedding, PositionalEncoding
-from encoder import Encoder
-from decoder import Decoder
+from feed_forward import PositionalFeedForward
+from attention import MultiHeadAttention
+from encoder import Encoder, EncoderBlock
+from decoder import Decoder, DecoderBlock
 from final_layer import FinalLayer
 
 class Transformer(nn.Module):
@@ -31,3 +31,22 @@ class Transformer(nn.Module):
     
     def linear(self, x):
         return self.linear_layer(x)
+
+
+
+def transformer_block(d_model, no_head,dff, dropout, vocab_size, max_len, N):
+
+
+    encoder_block = [EncoderBlock(dropout, d_model, no_head, dff) for i in range(N)]
+    encoder = Encoder(encoder_block , d_model)
+
+    decoder_block = [DecoderBlock(dropout, d_model, no_head, dff) for i in range(N)]
+    decoder = Decoder(decoder_block, d_model)
+
+    model = Transformer(vocab_size, d_model, max_len,encoder, decoder)
+
+    for p in model.parameters():
+        if p.dim() > 1:
+            nn.init.xavier_uniform_(p)
+
+    return model
