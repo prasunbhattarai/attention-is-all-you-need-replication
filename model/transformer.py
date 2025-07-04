@@ -31,7 +31,11 @@ class Transformer(nn.Module):
     
     def linear(self, x):
         return self.linear_layer(x)
-
+    
+    def forward(self,src,tgt, src_mask, tgt_mask):
+        enc_out = self.encode(src , src_mask)
+        dec_out = self.decode(tgt, enc_out, src_mask, tgt_mask)
+        return self.linear(dec_out)
 
 
 def transformer_block(d_model, no_head,dff, dropout, vocab_size, max_len, N):
